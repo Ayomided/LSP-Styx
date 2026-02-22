@@ -1,0 +1,110 @@
+[
+    {
+        "keys": [
+            "ctrl+alt+i"
+        ],
+        "command": "lsp_toggle_inlay_hints",
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.styx"
+            }
+        ]
+    },
+    {
+        "keys": [
+            "ctrl+k",
+            "ctrl+i"
+        ],
+        "command": "lsp_hover",
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.styx"
+            }
+        ]
+    },
+    {
+        "keys": [
+            "f12"
+        ],
+        "command": "lsp_symbol_definition",
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.styx"
+            }
+        ]
+    },
+    {
+        "keys": [
+            "shift+f12"
+        ],
+        "command": "lsp_symbol_references",
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.styx"
+            }
+        ]
+    },
+    {
+        "keys": [
+            "ctrl+shift+p"
+        ],
+        "command": "lsp_format_document",
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.styx"
+            }
+        ]
+    },
+    {
+        "keys": [
+            "f2"
+        ],
+        "command": "lsp_symbol_rename",
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.styx"
+            }
+        ]
+    },
+    {
+        "keys": [
+            "ctrl+."
+        ],
+        "command": "lsp_code_actions",
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.styx"
+            }
+        ]
+    },
+    {
+        "keys": [
+            "ctrl+b"
+        ],
+        "command": "build",
+        "args": {
+            "variant": "Check"
+        },
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.styx"
+            }
+        ]
+    }
+]

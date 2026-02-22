@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>name</key>
+  <string>Styx</string>
+  <key>scope</key>
+  <string>source.styx</string>
+  <key>settings</key>
+  <dict>
+
+    <key>shellVariables</key>
+    <array>
+      <dict>
+        <key>name</key>
+        <string>TM_COMMENT_START</string>
+        <key>value</key>
+        <string>// </string>
+      </dict>
+      <dict>
+        <key>name</key>
+        <string>TM_COMMENT_START_2</string>
+        <key>value</key>
+        <string>/// </string>
+      </dict>
+    </array>
+
+    <key>increaseIndentPattern</key>
+    <string>\{[^}]*$|\([^)]*$</string>
+
+    <key>decreaseIndentPattern</key>
+    <string>^\s*[}\)]</string>
+
+    <key>bracketIndentNextLinePattern</key>
+    <string>(?x)
+      ^ \s*
+      (?:
+        [A-Za-z_][A-Za-z0-9_.\-]*   # bare key
+        | "[^"]*"                     # quoted key
+        | @[A-Za-z_][A-Za-z0-9_\-]*  # tag key
+        | @                           # unit key
+      )
+      \s* $
+    </string>
+
+    <key>smartTypingPairs</key>
+    <array>
+      <array>
+        <string>"</string>
+        <string>"</string>
+      </array>
+      <array>
+        <string>{</string>
+        <string>}</string>
+      </array>
+      <array>
+        <string>(</string>
+        <string>)</string>
+      </array>
+    </array>
+
+    <key>showInSymbolList</key>
+    <integer>1</integer>
+
+    <key>symbolTransformation</key>
+    <string>
+      s/^\s*([A-Za-z_][A-Za-z0-9_.\\-]*)\s*\{.*$/$1/;
+      s/^\s*\/\/\/\s*(.+)$/$1/;
+    </string>
+
+  </dict>
+</dict>
+</plist>

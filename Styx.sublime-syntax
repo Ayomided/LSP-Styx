@@ -1,0 +1,215 @@
+%YAML 1.2
+---
+version: 2
+
+name: Styx
+file_extensions:
+  - styx
+
+scope: source.styx
+
+variables:
+  bare_char: '[^{}\(\),"=@\s>]'
+  tag_name: '[A-Za-z_][A-Za-z0-9_\-]*'
+  heredoc_delimiter: "[A-Z][A-Z0-9_]{0,15}"
+
+contexts:
+  main:
+    - include: comments
+    - include: doc-comments
+    - include: heredoc
+    - include: tags
+    - include: unit
+    - include: sequences
+    - include: objects
+    - include: quoted-scalar
+    - include: raw-scalar
+    - include: attributes
+    - include: bare-scalar
+
+  comments:
+    - match: "(?<!/)///(?!/)"
+      scope: punctuation.definition.comment.doc.styx
+      push:
+        - meta_scope: comment.line.documentation.styx
+        - match: "$"
+          pop: true
+    - match: "//"
+      scope: punctuation.definition.comment.styx
+      push:
+        - meta_scope: comment.line.double-slash.styx
+        - match: "$"
+          pop: true
+
+  doc-comments:
+    - match: "///"
+      scope: punctuation.definition.comment.doc.styx
+      push:
+        - meta_scope: comment.line.documentation.styx
+        - match: "$"
+          pop: true
+
+  unit:
+    - match: "@(?![A-Za-z_])"
+      scope: constant.language.unit.styx
+
+  tags:
+    - match: "(@)({{tag_name}})"
+      captures:
+        1: punctuation.definition.tag.styx
+        2: entity.name.tag.styx
+      push: tag-payload
+
+  tag-payload:
+    - match: '(?=[{(\s\n,})])'
+      # no payload or whitespace follows — implicit unit, pop
+      pop: true
+    - match: "@(?![A-Za-z_])"
+      scope: constant.language.unit.styx
+      pop: true
+    - match: '(?=["{])'
+      set: tag-payload-value
+    - match: '(?=\()'
+      set: tag-payload-value
+    - match: '(?=r#*")'
+      set: tag-payload-value
+    - match: "(?=<<)"
+      set: tag-payload-value
+    - match: ""
+      pop: true
+
+  tag-payload-value:
+    - include: quoted-scalar
+    - include: raw-scalar
+    - include: heredoc
+    - include: sequences
+    - include: objects
+    - match: ""
+      pop: true
+
+  sequences:
+    - match: '\('
+      scope: punctuation.section.sequence.begin.styx
+      push:
+        - meta_scope: meta.sequence.styx
+        - match: '\)'
+          scope: punctuation.section.sequence.end.styx
+          pop: true
+        - include: comments
+        - include: heredoc
+        - include: tags
+        - include: unit
+        - include: sequences
+        - include: objects
+        - include: quoted-scalar
+        - include: raw-scalar
+        - include: bare-scalar
+
+  objects:
+    - match: '\{'
+      scope: punctuation.section.block.begin.styx
+      push:
+        - meta_scope: meta.block.styx
+        - match: '\}'
+          scope: punctuation.section.block.end.styx
+          pop: true
+        - match: ","
+          scope: punctuation.separator.styx
+        - include: comments
+        - include: doc-comments
+        - include: heredoc
+        - include: tags
+        - include: unit
+        - include: sequences
+        - include: objects
+        - include: quoted-scalar
+        - include: raw-scalar
+        - include: attributes
+        - include: bare-scalar
+
+  quoted-scalar:
+    - match: '"'
+      scope: punctuation.definition.string.begin.styx
+      push:
+        - meta_scope: string.quoted.double.styx
+        - match: '"'
+          scope: punctuation.definition.string.end.styx
+          pop: true
+        - match: '\\(?:[\\"/nrt0]|u[0-9A-Fa-f]{4}|u\{[0-9A-Fa-f]{1,6}\})'
+          scope: constant.character.escape.styx
+        - match: '\\.'
+          scope: invalid.illegal.escape.styx
+
+  raw-scalar:
+    - match: 'r(#+)"'
+      scope: punctuation.definition.string.begin.styx
+      captures:
+        1: punctuation.definition.string.raw.styx
+      push:
+        - meta_scope: string.unquoted.raw.styx
+        - match: '"(#+)'
+          scope: punctuation.definition.string.end.styx
+          pop: true
+
+  heredoc:
+    - match: '(<<)({{heredoc_delimiter}})(?:(,)([a-z][a-z0-9_.\-]*))?'
+      captures:
+        1: punctuation.definition.string.begin.styx
+        2: entity.name.label.heredoc.styx
+        3: punctuation.separator.styx
+        4: storage.type.language-hint.styx
+      push: heredoc-body
+
+  heredoc-body:
+    - meta_scope: string.unquoted.heredoc.styx
+    - match: '^(\s*)({{heredoc_delimiter}})$'
+      captures:
+        2: entity.name.label.heredoc.styx
+      pop: true
+
+  attributes:
+    # key=value attribute syntax (note: spec uses > not =, but grammar shows =)
+    # Actually spec shows key>value shorthand in prose, grammar shows BareScalar '=' AttributeValue
+    # Let's support both forms
+    - match: "({{bare_char}}+)(>)"
+      captures:
+        1: entity.other.attribute-name.styx
+        2: punctuation.separator.key-value.styx
+      push: attribute-value
+    - match: "({{bare_char}}+)(=)"
+      captures:
+        1: entity.other.attribute-name.styx
+        2: punctuation.separator.key-value.styx
+      push: attribute-value
+
+  attribute-value:
+    - include: quoted-scalar
+    - include: sequences
+    - include: objects
+    - match: "{{bare_char}}+"
+      scope: string.unquoted.styx
+      pop: true
+    - match: ""
+      pop: true
+
+  bare-scalar:
+    # Highlight common boolean/null-like values
+    - match: '\b(true|false|null|yes|no|on|off)\b'
+      scope: constant.language.styx
+    # Numbers
+    - match: '\b-?(?:0x[0-9A-Fa-f]+|0b[01]+|0o[0-7]+|[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)\b'
+      scope: constant.numeric.styx
+    # Dotted key paths (keys like foo.bar.baz)
+    - match: '(?={{bare_char}}+\.{{bare_char}})'
+      push: dotted-key
+    # Regular bare scalar
+    - match: "{{bare_char}}+"
+      scope: string.unquoted.styx
+
+  dotted-key:
+    - match: '\.'
+      scope: punctuation.accessor.dot.styx
+    - match: "{{bare_char}}+"
+      scope: variable.other.member.styx
+    - match: '(?=[{(\s\n,})]|$)'
+      pop: true

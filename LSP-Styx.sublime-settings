@@ -1,0 +1,32 @@
+{
+    "clients": {
+        "styx": {
+            "command": [
+                "styx",
+                "lsp"
+            ],
+            "selector": "source.styx",
+            "initializationOptions": {
+                "inlayHints": {
+                    "enabled": true,
+                    "typeAnnotations": true,
+                    "keyPaths": false
+                },
+                "completion": {
+                    "enabled": true,
+                    "snippetsEnabled": true
+                },
+                "diagnostics": {
+                    "enabled": true
+                }
+            },
+            "settings": {
+                "inlayHints": {
+                    "enabled": true
+                }
+            },
+            "enabled": true,
+            "trace": "verbose"
+        }
+    }
+}

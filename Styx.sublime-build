@@ -1,0 +1,48 @@
+{
+    "name": "Styx",
+    "cmd": [
+        "styx",
+        "check",
+        "$file"
+    ],
+    "file_regex": "^(.+?):(\\d+):(\\d+):\\s+(error|warning):\\s+(.*)$",
+    "selector": "source.styx",
+    "encoding": "utf-8",
+    "target": "exec",
+    "working_dir": "$folder",
+    "variants": [
+        {
+            "name": "Check",
+            "cmd": [
+                "styx",
+                "check",
+                "$file"
+            ]
+        },
+        {
+            "name": "Check Workspace",
+            "cmd": [
+                "styx",
+                "check",
+                "."
+            ],
+            "working_dir": "$folder"
+        },
+        {
+            "name": "Dump AST",
+            "cmd": [
+                "styx",
+                "dump",
+                "$file"
+            ]
+        },
+        {
+            "name": "Format",
+            "cmd": [
+                "styx",
+                "fmt",
+                "$file"
+            ]
+        }
+    ]
+}
